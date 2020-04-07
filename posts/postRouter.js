@@ -22,8 +22,36 @@ router.get(`/:id`, (req, res) => {
   const id = req.params.id
   Posts.findById(id)
   .then(post => {
-    console.log(post)
+    {post 
+      ? res.status(200).json(post) 
+      : res.status(404).json({error: "The posts information could not be retrieved."}) 
+    }
   })
 })
 
-  module.exports = router;
+router.get(`/:id/comments`, (req, res) => {
+  const id = req.params.id
+  Posts.findById(id)
+  .then(post => {
+    if(post < 3){
+      res.status(404).json({ message: "The post with the specified ID does not exist." })
+    } else {
+      Posts.findPostComments(id)
+      .then(comments =>{
+        if(comments) {
+          res.status(200).json(comments)
+        }else {
+          res.status(404).json({error: "no comments found here"})
+        }
+      }) 
+      .catch((error) => {
+        console.log("error retrieveing comments", error);
+        res.status(500).json({
+            errorMessage: "there wasn an error trying to retrieve that comment info"
+        })
+      })
+    }
+  })
+})
+
+module.exports = router;
