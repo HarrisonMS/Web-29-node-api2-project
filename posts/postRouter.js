@@ -33,7 +33,7 @@ router.get(`/:id/comments`, (req, res) => {
   const id = req.params.id
   Posts.findById(id)
   .then(post => {
-    if(post < 3){
+    if(post.length === 0){
       res.status(404).json({ message: "The post with the specified ID does not exist." })
     } else {
       Posts.findPostComments(id)
@@ -94,7 +94,7 @@ router.post(`/:id/comments`, (req, res) => {
   const id = req.params.id
   Posts.findById(id)
   .then(post => {
-    if(post < 3){
+    if(post.length === 0){
       res.status(404).json({ message: "The post with the specified ID does not exist." })
     } else {
       const comments = req.body;
@@ -143,4 +143,38 @@ router.post(`/:id/comments`, (req, res) => {
 //   }
 //   })
 // })
+router.put('/:id', (req, res) => {
+  if(!req.body.title || !req.body.contents) {
+      res.status(400).json({errorMessage: "please provide title and contents for the post"})
+  } 
+  Posts
+  .update(req.params.id, req.body)
+  .then(count => {
+      if (count > 0) {
+          Posts.findById(req.params.id)
+          .then((post) => {
+              res.status(200).json(post)
+          })  
+      }
+  })
+  .catch(error => {
+    // log error to server
+    console.log(error);
+    res.status(500).json({
+      message: 'Error updating the post'
+      });
+  });
+});
+
+router.delete("/:id", (req, res) => {
+  Posts.remove(req.params.id)
+  .then(removed => {
+      if(removed) {
+          res.status(404).json({message: "post deleted", removed})
+      }else{
+          res.status(200).json({message: "post not found"})
+      }
+  })
+  
+})
 module.exports = router;
