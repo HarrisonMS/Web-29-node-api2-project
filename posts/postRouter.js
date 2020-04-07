@@ -54,4 +54,19 @@ router.get(`/:id/comments`, (req, res) => {
   })
 })
 
+router.post('/', (req, res) => {
+  const posts = req.body;
+  if(!posts.title || !posts.contents) {
+    res.status(400).json({ errorMessage: "Please provide title and contents for the post."})
+  } else {
+    Posts.insert(posts)
+    .then((post) => {
+      res.status(201).json(post)
+    }).catch((error) => {
+      console.log('error saving post');
+      res.status(500).json({ error: "There was an error while saving the post to the database" })
+    })
+  }
+})
+
 module.exports = router;
