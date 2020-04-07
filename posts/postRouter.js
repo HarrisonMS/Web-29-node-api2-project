@@ -69,4 +69,78 @@ router.post('/', (req, res) => {
   }
 })
 
+// router.post("/:id/comments", (req, res) => {
+//   const comments = req.body;
+//   if (!comments.text) {
+//       res.status(400).json({ errorMessage:"you need to provide a text field."})
+//   }else {
+//       comments.post_id = req.params.id;
+//       Posts.insertComment(comments)
+//       .then((comments) => {
+//           Posts.findPostComments(comments)
+//           .then((posts) => {
+//               res.status(201).json(posts);
+//           })
+//       })
+//       .catch((error) => {
+//           console.log("error on the POST no text field", error);
+//           res.status(500).json({
+//               errorMessage: " There was an error while saving the comment"
+//           })
+//       })
+//   }
+// })
+router.post(`/:id/comments`, (req, res) => {
+  const id = req.params.id
+  Posts.findById(id)
+  .then(post => {
+    if(post < 3){
+      res.status(404).json({ message: "The post with the specified ID does not exist." })
+    } else {
+      const comments = req.body;
+      if (!comments.text) {
+          res.status(400).json({ errorMessage:"you need to provide a text field."})
+      }else {
+          comments.post_id = req.params.id;
+          Posts.insertComment(comments)
+          .then((comments) => {
+              Posts.findPostComments(comments)
+              .then((posts) => {
+                  res.status(201).json(posts);
+              })
+          })
+          .catch((error) => {
+              console.log("error on the POST no text field", error);
+              res.status(500).json({
+                  errorMessage: " There was an error while saving the comment"
+              })
+          })
+      }
+    }
+  })
+})
+// router.post(`/:id/comments`, (req, res) => {
+//   const id = req.params.id
+//   Posts.findById(id) 
+//   .then((post) => {
+//     if(post.toString() === 0){
+//       res.status(404).json({ message: "The post with the specified ID does not exist." })
+//     } else {
+//       comments.post_id = req.params.id;
+//       Posts.insertComment(comments)
+//       .then((comments) => {
+//           Posts.findPostComments(comments)
+//           .then((posts) => {
+//               res.status(201).json(posts);
+//           })
+//       })
+//       .catch((error) => {
+//           console.log("error on the POST no text field", error);
+//           res.status(500).json({
+//               errorMessage: " There was an error while saving the comment"
+//           })
+//       })
+//   }
+//   })
+// })
 module.exports = router;
